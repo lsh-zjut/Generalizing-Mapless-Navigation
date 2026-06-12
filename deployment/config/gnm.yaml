@@ -1,0 +1,10 @@
+model_type: gnm
+
+obs_encoding_size: 1024
+goal_encoding_size: 1024
+
+normalize: true
+context_size: 5
+len_traj_pred: 5
+learn_angle: true
+image_size: [85, 64]

@@ -1,0 +1,3 @@
+gnm:
+  config_path: "../config/gnm.yaml"
+  ckpt_path: "../model_weights/gnm.pth"

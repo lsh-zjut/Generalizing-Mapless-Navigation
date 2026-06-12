@@ -1,0 +1,12 @@
+# The base Jackal configuration has no accessories at all.
+# Explicitly disable optional sensors so the base model does not depend
+# on external accessory description packages being installed.
+JACKAL_LASER=0
+JACKAL_LASER_3D=0
+JACKAL_LASER_SECONDARY=0
+JACKAL_NAVSAT=0
+JACKAL_FLEA3=0
+JACKAL_STEREO_FLEA3=0
+JACKAL_BB2=0
+JACKAL_BLACKFLY=0
+KINECT=0

@@ -1,0 +1,18 @@
+# linear and angular speed limits
+max_v: 1.0
+max_w: 0.6
+
+# observation rate
+frame_rate: 10
+graph_rate: 0.5
+
+# robot footprint (meters)
+robot_length: 0.42
+robot_width: 0.30
+
+# topic names
+vel_teleop_topic: /cmd_vel
+vel_navi_topic: /cmd_vel
+base_scan_topic: /front/scan
+odom_topic: /gazebo/ground_truth/state
+depth_topic: /front/rgb/image_raw

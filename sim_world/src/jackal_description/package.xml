@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>jackal_description</name>
+  <version>0.0.0</version>
+  <description>The jackal_description package</description>
+
+  <maintainer email="lsh@todo.todo">lsh</maintainer>
+
+  <license>BSD-3-Clause</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>roslaunch</build_depend>
+  <exec_depend>flir_camera_description</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
+  <exec_depend>lms1xx</exec_depend>
+  <exec_depend>pointgrey_camera_description</exec_depend>
+  <exec_depend>sick_tim</exec_depend>
+  <exec_depend>velodyne_description</exec_depend>
+  
+  <export>
+ 
+  </export>
+</package>

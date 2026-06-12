@@ -1,0 +1,267 @@
+Panels:
+  - Class: rviz/Displays
+    Help Height: 78
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /TF1
+        - /Robot1
+        - /Hydra Input Cloud1
+        - /Hydra Mesh1
+      Splitter Ratio: 0.5
+    Tree Height: 520
+  - Class: rviz/Selection
+    Name: Selection
+  - Class: rviz/Tool Properties
+    Expanded:
+      - /2D Pose Estimate1
+      - /2D Nav Goal1
+      - /Publish Point1
+    Name: Tool Properties
+    Splitter Ratio: 0.5886790156364441
+  - Class: rviz/Views
+    Expanded:
+      - /Current View1
+    Name: Views
+    Splitter Ratio: 0.5
+  - Class: rviz/Time
+    Experimental: false
+    Name: Time
+    SyncMode: 0
+    SyncSource: RGB
+Preferences:
+  PromptSaveOnExit: true
+Toolbars:
+  toolButtonStyle: 2
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Alpha: 0.45
+      Cell Size: 0.5
+      Class: rviz/Grid
+      Color: 160; 160; 164
+      Enabled: true
+      Line Style:
+        Line Width: 0.029999999329447746
+        Value: Lines
+      Name: Grid
+      Normal Cell Count: 0
+      Offset:
+        X: 0
+        Y: 0
+        Z: 0
+      Plane: XY
+      Plane Cell Count: 200
+      Reference Frame: <Fixed Frame>
+      Value: true
+    - Class: rviz/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        base_link:
+          Value: true
+        chassis_link:
+          Value: true
+        front_frame_optical:
+          Value: true
+        front_kinect:
+          Value: true
+        world:
+          Value: true
+      Marker Scale: 0.6
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: true
+      Tree:
+        world:
+          chassis_link:
+            base_link:
+              {}
+            front_fender_link:
+              {}
+            front_mount:
+              front_camera_mount:
+                front_camera_beam:
+                  front_kinect:
+                    front_frame_optical:
+                      {}
+              tim551_mount_link:
+                tim551:
+                  {}
+            imu_link:
+              {}
+            mid_mount:
+              {}
+            navsat_link:
+              {}
+            rear_fender_link:
+              {}
+            rear_mount:
+              {}
+      Update Interval: 0
+      Value: true
+    - Alpha: 1
+      Class: rviz/RobotModel
+      Collision Enabled: false
+      Enabled: true
+      Links:
+        All Links Enabled: true
+      Name: Robot
+      TF Prefix: ""
+      Update Interval: 0
+      Value: true
+      Visual Enabled: true
+    - Class: rviz/PointCloud2
+      Enabled: true
+      Name: Hydra Input Cloud
+      Style: Flat Squares
+      Topic: /hydra_input_pointcloud
+      Queue Size: 2
+      Size (Pixels): 2
+      Size (m): 0.02
+      Color Transformer: RGB8
+      Selectable: true
+      Unreliable: false
+      Use Fixed Frame: true
+      Value: true
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /hydra_topology_node/graph_viz
+      Name: Places
+      Namespaces:
+        topology_graph_edges: true
+        topology_graph_nodes: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /hydra_topology_node/gvd_viz
+      Name: GVD
+      Namespaces:
+        gvd_visualizer: true
+      Queue Size: 100
+      Value: true
+    - Class: rviz/Marker
+      Enabled: true
+      Marker Topic: /hydra_topology_node/voxel_block_viz
+      Name: Active Window
+      Namespaces:
+        topology_server_blocks: true
+      Queue Size: 100
+      Value: true
+    - Class: voxblox_rviz_plugin/VoxbloxMesh
+      Enabled: true
+      Name: Hydra Mesh
+      Topic: /hydra_topology_node/mesh_viz
+      Unreliable: false
+      Value: true
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /front/rgb/image_raw
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: RGB
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /front/depth/image_raw
+      Max Value: 5
+      Median window: 5
+      Min Value: 0
+      Name: Depth
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+    - Class: rviz/Image
+      Enabled: true
+      Image Topic: /front/semantic/image_raw
+      Max Value: 1
+      Median window: 5
+      Min Value: 0
+      Name: Semantics
+      Normalize Range: true
+      Queue Size: 2
+      Transport Hint: raw
+      Unreliable: false
+      Value: true
+  Enabled: true
+  Global Options:
+    Background Color: 48; 48; 48
+    Default Light: true
+    Fixed Frame: world
+    Frame Rate: 30
+  Name: root
+  Tools:
+    - Class: rviz/Interact
+      Hide Inactive Objects: true
+    - Class: rviz/MoveCamera
+    - Class: rviz/Select
+    - Class: rviz/FocusCamera
+    - Class: rviz/Measure
+    - Class: rviz/SetInitialPose
+      Theta std deviation: 0.2617993950843811
+      Topic: /initialpose
+      X std deviation: 0.5
+      Y std deviation: 0.5
+    - Class: rviz/SetGoal
+      Topic: /move_base_simple/goal
+    - Class: rviz/PublishPoint
+      Single click: true
+      Topic: /clicked_point
+  Value: true
+  Views:
+    Current:
+      Class: rviz/Orbit
+      Distance: 18
+      Enable Stereo Rendering:
+        Stereo Eye Separation: 0.05999999865889549
+        Stereo Focal Distance: 1
+        Swap Stereo Eyes: false
+        Value: false
+      Focal Point:
+        X: -2.5
+        Y: -8.5
+        Z: 0.6
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.05000000074505806
+      Invert Z Axis: false
+      Name: Current View
+      Near Clip Distance: 0.009999999776482582
+      Pitch: 0.85
+      Target Frame: <Fixed Frame>
+      Value: Orbit (rviz)
+      Yaw: 1.1
+    Saved: ~
+Window Geometry:
+  Depth:
+    collapsed: false
+  Displays:
+    collapsed: false
+  Height: 1080
+  Hide Left Dock: false
+  Hide Right Dock: false
+  RGB:
+    collapsed: false
+  Semantics:
+    collapsed: false
+  Selection:
+    collapsed: false
+  Time:
+    collapsed: false
+  Tool Properties:
+    collapsed: false
+  Views:
+    collapsed: false
+  Width: 1920
+  X: 0
+  Y: 27

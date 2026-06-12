@@ -1,0 +1,120 @@
+<launch>
+  <arg name="use_semantics" default="false" />
+  <arg name="start_visualizer" default="true" />
+  <arg name="run_dsg_builder" default="true" />
+  <arg name="robot_id" default="0" />
+  <arg name="sensor_frame" default="front_frame_optical" />
+  <arg name="geometry_cloud_hz" default="2.0" />
+  <arg name="rgbd_queue_size" default="5" />
+  <arg name="topology_update_period_s" default="1.0" />
+  <arg name="rviz_config" default="$(find sim_world)/rviz/hydra_gnm_sim.rviz" />
+  <arg name="dsg_rviz_file" default="hydra_streaming_visualizer.rviz" />
+  <arg name="semantic_model" default="maskrcnn" />
+  <arg name="semantic_rate_hz" default="1.0" />
+  <arg name="semantic_score_threshold" default="0.7" />
+  <arg name="semantic_device" default="cuda" />
+  <arg name="semantic_image_topic" default="/front/semantic/image_raw" />
+  <arg name="semantic_color_map" default="$(find kimera_semantics_ros)/cfg/maskrcnn_mapping.csv" />
+  <arg name="pointcloud_topic" default="/semantic_pointcloud" if="$(arg use_semantics)" />
+  <arg name="pointcloud_topic" default="/hydra_input_pointcloud" unless="$(arg use_semantics)" />
+  <arg name="raw_geometry_pointcloud_topic" default="/hydra_input_pointcloud_raw" />
+
+  <param name="use_sim_time" value="true" />
+
+  <!-- Publish only the camera frame Hydra needs, without duplicating wheel TF from Gazebo. -->
+  <node name="hydra_sensor_tf"
+        pkg="tf2_ros"
+        type="static_transform_publisher"
+        output="log"
+        args="0.242 0 0.167 -1.57079632679 0 -1.57079632679 chassis_link $(arg sensor_frame)" />
+
+  <!-- Publish the robot ground-truth pose from Gazebo into TF so Hydra can query world->sensor_frame. -->
+  <include file="$(find hydra_utils)/launch/odom_to_tf.launch">
+    <arg name="odom_topic" value="/gazebo/ground_truth/state" />
+    <arg name="odom_frame" value="chassis_link" />
+    <arg name="required" value="true" />
+  </include>
+
+  <!-- Semantic mode expects an external segmentation image on semantic_image_topic. -->
+  <include if="$(arg use_semantics)" file="$(find kimera_semantics_ros)/launch/kimera_semantics.launch">
+    <arg name="should_use_sim_time" value="true" />
+    <arg name="sensor_frame" value="$(arg sensor_frame)" />
+    <arg name="metric_semantic_reconstruction" value="true" />
+    <arg name="semantic_label_2_color_csv_filepath" value="$(arg semantic_color_map)" />
+    <arg name="semantic_pointcloud" value="$(arg pointcloud_topic)" />
+    <arg name="left_cam_info_topic" value="/front/rgb/camera_info" />
+    <arg name="left_cam_topic" value="/front/rgb/image_raw" />
+    <arg name="left_cam_segmentation_topic" value="$(arg semantic_image_topic)" />
+    <arg name="left_cam_depth_topic" value="/front/depth/image_raw" />
+    <arg name="run_stereo_dense" value="false" />
+    <arg name="publish_point_clouds" value="true" />
+  </include>
+
+  <node if="$(eval arg('use_semantics') and arg('semantic_model') == 'maskrcnn')"
+        pkg="sim_world"
+        type="maskrcnn_semantic_segmentation.py"
+        name="maskrcnn_semantic_segmentation"
+        output="screen">
+    <param name="input_topic" value="/front/rgb/image_raw" />
+    <param name="output_topic" value="$(arg semantic_image_topic)" />
+    <param name="semantic_csv" value="$(arg semantic_color_map)" />
+    <param name="max_rate_hz" value="$(arg semantic_rate_hz)" />
+    <param name="score_threshold" value="$(arg semantic_score_threshold)" />
+    <param name="device" value="$(arg semantic_device)" />
+  </node>
+
+  <!-- Geometric mode uses the Gazebo RGBD stream directly and skips semantics entirely. -->
+  <include unless="$(arg use_semantics)" file="$(find hydra_utils)/launch/includes/rgbd_to_pointcloud.xml">
+    <arg name="rgb_info_topic" value="/front/rgb/camera_info" />
+    <arg name="rgb_topic" value="/front/rgb/image_raw" />
+    <arg name="depth_topic" value="/front/depth/image_raw" />
+    <arg name="pointcloud_topic" value="$(arg raw_geometry_pointcloud_topic)" />
+    <arg name="queue_size" value="$(arg rgbd_queue_size)" />
+  </include>
+
+  <node unless="$(arg use_semantics)"
+        pkg="topic_tools"
+        type="throttle"
+        name="hydra_pointcloud_throttle"
+        args="messages $(arg raw_geometry_pointcloud_topic) $(arg geometry_cloud_hz) $(arg pointcloud_topic)"
+        output="screen" />
+
+  <include file="$(find hydra_topology)/launch/hydra_topology.launch">
+    <arg name="use_semantics" value="$(arg use_semantics)" />
+    <arg name="config" value="d455_topology_config.yaml" />
+    <arg name="sensor_frame" value="$(arg sensor_frame)" />
+    <arg name="pointcloud_topic" value="$(arg pointcloud_topic)" />
+    <arg name="config_dir" value="$(find hydra_topology)/config" />
+    <arg name="semantic_config" value="ade150_semantic_config.yaml" if="$(arg use_semantics)" />
+    <arg name="semantic_color_path" value="$(arg semantic_color_map)" if="$(arg use_semantics)" />
+    <arg name="publish_archived" value="true" />
+    <arg name="update_period_s" value="$(arg topology_update_period_s)" />
+    <arg name="debug" value="false" />
+  </include>
+
+  <node if="$(eval arg('start_visualizer') and not arg('run_dsg_builder'))"
+        pkg="rviz"
+        type="rviz"
+        name="hydra_rviz"
+        output="log"
+        args="-d $(arg rviz_config)" />
+
+  <include if="$(arg run_dsg_builder)" file="$(find hydra_dsg_builder)/launch/dsg_builder.launch">
+    <arg name="robot_id" value="$(arg robot_id)" />
+    <arg name="config_dir" value="$(find hydra_dsg_builder)/config/d455" />
+    <arg name="dsg_output_dir" value="$(find hydra_dsg_builder)/output" />
+    <arg name="dsg_output_prefix" value="gnm_sim" />
+    <arg name="typology_dir" value="$(find hydra_dsg_builder)/config/d455" />
+    <arg name="typology_config" value="d455_typology.yaml" />
+    <arg name="semantic_map_dir" value="$(find kimera_semantics_ros)/cfg" />
+    <arg name="semantic_map_file" value="maskrcnn_mapping.csv" />
+    <arg name="semantic_map_path" value="$(arg semantic_color_map)" />
+    <arg name="sensor_frame" value="$(arg sensor_frame)" />
+    <arg name="use_gt_frame" value="true" />
+    <arg name="start_visualizer" value="$(arg start_visualizer)" />
+    <arg name="rviz_file" value="$(arg dsg_rviz_file)" />
+    <arg name="enable_dsg_lcd" value="false" />
+    <arg name="enable_lcd_viz" value="false" />
+    <arg name="use_oriented_bounding_boxes" value="true" />
+  </include>
+</launch>

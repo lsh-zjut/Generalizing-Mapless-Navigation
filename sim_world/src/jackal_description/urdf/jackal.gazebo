@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <gazebo>
+    <plugin name="p3d_base_controller" filename="libgazebo_ros_p3d.so">
+      <alwaysOn>true</alwaysOn>
+      <updateRate>50.0</updateRate>
+      <bodyName>chassis_link</bodyName>
+      <topicName>/gazebo/ground_truth/state</topicName>
+      <gaussianNoise>0.0</gaussianNoise>
+      <frameName>world</frameName>
+      <xyzOffsets>0 0 0</xyzOffsets>
+      <rpyOffsets>0 0 0</rpyOffsets>
+    </plugin>
+  </gazebo>
+
+  <xacro:if value="$(optenv JACKAL_ENABLE_GAZEBO_ROS_CONTROL 0)">
+    <gazebo>
+      <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+        <robotNamespace>/</robotNamespace>
+      </plugin>
+    </gazebo>
+  </xacro:if>
+
+  <xacro:unless value="$(optenv JACKAL_ENABLE_GAZEBO_ROS_CONTROL 0)">
+    <gazebo>
+      <plugin name="gazebo_ros_diff_drive" filename="libgazebo_ros_diff_drive.so">
+        <robotNamespace>/</robotNamespace>
+        <publishTf>false</publishTf>
+        <publishWheelTF>false</publishWheelTF>
+        <publishWheelJointState>true</publishWheelJointState>
+        <legacyMode>false</legacyMode>
+        <odometryTopic>jackal_velocity_controller/odom</odometryTopic>
+        <commandTopic>cmd_vel</commandTopic>
+        <odometryFrame>odom</odometryFrame>
+        <robotBaseFrame>base_link</robotBaseFrame>
+        <leftJoint>front_left_wheel</leftJoint>
+        <leftJoint>rear_left_wheel</leftJoint>
+        <rightJoint>front_right_wheel</rightJoint>
+        <rightJoint>rear_right_wheel</rightJoint>
+        <wheelSeparation>0.37559</wheelSeparation>
+        <wheelDiameter>0.196</wheelDiameter>
+        <wheelAcceleration>4.0</wheelAcceleration>
+        <wheelTorque>80</wheelTorque>
+        <updateRate>50.0</updateRate>
+      </plugin>
+    </gazebo>
+  </xacro:unless>
+
+  <xacro:if value="$(optenv JACKAL_ENABLE_HECTOR_IMU 1)">
+    <gazebo>
+      <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
+        <robotNamespace>/</robotNamespace>
+        <updateRate>50.0</updateRate>
+        <bodyName>imu_link</bodyName>
+        <topicName>imu/data</topicName>
+        <accelDrift>0.005 0.005 0.005</accelDrift>
+        <accelGaussianNoise>0.005 0.005 0.005</accelGaussianNoise>
+        <rateDrift>0.005 0.005 0.005 </rateDrift>
+        <rateGaussianNoise>0.005 0.005 0.005 </rateGaussianNoise>
+        <headingDrift>0.005</headingDrift>
+        <headingGaussianNoise>0.005</headingGaussianNoise>
+      </plugin>
+    </gazebo>
+  </xacro:if>
+
+  <xacro:if value="$(optenv JACKAL_ENABLE_HECTOR_GPS 1)">
+    <gazebo>
+      <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+        <updateRate>40</updateRate>
+        <robotNamespace>/</robotNamespace>
+        <bodyName>navsat_link</bodyName>
+        <frameId>base_link</frameId>
+        <topicName>/navsat/fix</topicName>
+        <velocityTopicName>/navsat/vel</velocityTopicName>
+        <referenceLatitude>$(optenv GAZEBO_WORLD_LAT 49.9)</referenceLatitude>
+        <referenceLongitude>$(optenv GAZEBO_WORLD_LON 8.9)</referenceLongitude>
+        <referenceHeading>90</referenceHeading>
+        <referenceAltitude>0</referenceAltitude>
+        <drift>0.0001 0.0001 0.0001</drift>
+      </plugin>
+    </gazebo>
+  </xacro:if>
+
+  <gazebo reference="base_link">
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+
+  <gazebo reference="chassis_link">
+    <material>Gazebo/DarkGrey</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+  <gazebo reference="imu_link">
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+
+  <gazebo reference="navsat_link">
+    <material>Gazebo/DarkGrey</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+  <gazebo reference="front_fender_link">
+    <material>Gazebo/Yellow</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+  <gazebo reference="rear_fender_link">
+    <material>Gazebo/Yellow</material>
+    <turnGravityOff>false</turnGravityOff>
+  </gazebo>
+</robot>

@@ -1,0 +1,13 @@
+<launch>
+  <arg name="with_keyboard" default="true" />
+  <arg name="with_twist_marker" default="true" />
+
+  <node if="$(arg with_keyboard)" name="teleop_twist_keyboard" pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" output="screen" respawn="true"/>
+
+  <include if="$(arg with_twist_marker)" file="$(find interactive_marker_twist_server)/launch/interactive_markers.launch">
+    <arg name="config" value="planar" />
+  </include>
+
+  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find sim_world)/rviz/manual.rviz" output="log" respawn="true"/>
+
+</launch>
