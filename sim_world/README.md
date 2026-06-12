@@ -13,7 +13,7 @@ In this setup:
 This workspace mainly contains:
 
 - `src/sim_world/`: simulation worlds, launch files, RViz configs, and helper scripts
-- `src/jackal_description/`: Jackal robot description, sensors, meshes, and Gazebo configuration
+- `src/jackal_description/`: bundled Jackal robot description, sensors, meshes, and Gazebo configuration used by this project
 
 The `sim_world` package currently includes two simulation environments:
 
