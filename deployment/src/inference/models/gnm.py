@@ -1,11 +1,36 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision.models import mobilenet_v2
 
 from typing import Optional, Tuple
 
 from inference.models.base_model import BaseModel
-from inference.models.modified_mobilenetv2 import MobileNetEncoder
+
+
+def build_stacked_mobilenet_features(num_images: int) -> tuple[nn.Sequential, int]:
+    backbone = mobilenet_v2(weights=None)
+    first_block = backbone.features[0]
+    first_conv = first_block[0]
+    new_in_channels = num_images * 3
+
+    if first_conv.in_channels != new_in_channels:
+        first_block[0] = nn.Conv2d(
+            in_channels=new_in_channels,
+            out_channels=first_conv.out_channels,
+            kernel_size=first_conv.kernel_size,
+            stride=first_conv.stride,
+            padding=first_conv.padding,
+            dilation=first_conv.dilation,
+            groups=first_conv.groups,
+            bias=first_conv.bias is not None,
+            padding_mode=first_conv.padding_mode,
+        )
+        nn.init.kaiming_normal_(first_block[0].weight, mode="fan_out")
+        if first_block[0].bias is not None:
+            nn.init.zeros_(first_block[0].bias)
+
+    return backbone.features, backbone.last_channel
 
 
 class GNM(BaseModel):
@@ -18,18 +43,20 @@ class GNM(BaseModel):
         goal_encoding_size: Optional[int] = 1024,
     ) -> None:
         super(GNM, self).__init__(context_size, len_traj_pred, learn_angle)
-        mobilenet = MobileNetEncoder(num_images=1 + self.context_size)
-        self.obs_mobilenet = mobilenet.features
+        self.obs_mobilenet, obs_last_channel = build_stacked_mobilenet_features(
+            num_images=1 + self.context_size
+        )
         self.obs_encoding_size = obs_encoding_size
         self.compress_observation = nn.Sequential(
-            nn.Linear(mobilenet.last_channel, self.obs_encoding_size),
+            nn.Linear(obs_last_channel, self.obs_encoding_size),
             nn.ReLU(),
         )
-        stacked_mobilenet = MobileNetEncoder(num_images=2 + self.context_size)
-        self.goal_mobilenet = stacked_mobilenet.features
+        self.goal_mobilenet, goal_last_channel = build_stacked_mobilenet_features(
+            num_images=2 + self.context_size
+        )
         self.goal_encoding_size = goal_encoding_size
         self.compress_goal = nn.Sequential(
-            nn.Linear(stacked_mobilenet.last_channel, 1024),
+            nn.Linear(goal_last_channel, 1024),
             nn.ReLU(),
             nn.Linear(1024, self.goal_encoding_size),
             nn.ReLU(),

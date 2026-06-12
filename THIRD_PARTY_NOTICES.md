@@ -17,14 +17,6 @@ The following files contain their own BSD-style copyright and redistribution not
 
 Those notices must be retained when redistributing the files.
 
-### PyTorch torchvision derived source
-
-The following file is marked as modified from the PyTorch torchvision library:
-
-- `deployment/src/inference/models/modified_mobilenetv2.py`
-
-If you continue distributing that file, keep the attribution comment and make sure your final public release remains compatible with the upstream torchvision license terms.
-
 ## Practical Publishing Note
 
 Because this repository includes material from multiple sources, treat it as a mixed-license repository:
